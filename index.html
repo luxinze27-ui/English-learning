@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Learn English</title>
+
+<style>
+body { font-family: Arial; margin:0; background:#f5f7fa; }
+header { background:#4CAF50; color:white; text-align:center; padding:15px; }
+.container { padding:15px; }
+
+.category-card {
+  background:white;
+  padding:20px;
+  border-radius:12px;
+  margin-bottom:10px;
+  text-align:center;
+  font-size:18px;
+  box-shadow:0 2px 6px rgba(0,0,0,0.1);
+}
+
+.card-container {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+}
+.card {
+  background:white;
+  padding:20px;
+  border-radius:12px;
+  text-align:center;
+}
+
+.english { display:none; }
+
+#qtext {
+  font-size:28px;
+  font-weight:bold;
+  text-align:center;
+  margin:20px 0;
+}
+
+.options button {
+  width:100%;
+  margin:12px 0;
+  padding:18px;
+  font-size:18px;
+  border:none;
+  border-radius:14px;
+  background:#2196F3;
+  color:white;
+}
+
+.correct { background:#4CAF50 !important; }
+.wrong { background:#f44336 !important; }
+
+.next {
+  width:100%;
+  padding:16px;
+  margin-top:15px;
+  background:#333;
+  color:white;
+  border:none;
+  border-radius:12px;
+  display:none;
+}
+
+.review-card {
+  background:white;
+  padding:16px;
+  border-radius:14px;
+  margin-bottom:12px;
+}
+
+.review-sen {
+  margin-top:10px;
+  padding:10px;
+  background:#f0f4f8;
+  border-radius:10px;
+  cursor:pointer;
+}
+
+.translation { display:none; margin-top:8px; }
+
+.reset-btn {
+  width:100%;
+  margin-bottom:12px;
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:#f44336;
+  color:white;
+  font-weight:bold;
+}
+
+.tabbar {
+  position:fixed;
+  bottom:0;
+  width:100%;
+  display:flex;
+  background:white;
+  border-top:1px solid #ddd;
+}
+
+.tabbar button {
+  flex:1;
+  padding:16px;
+  font-size:16px;
+  font-weight:bold;
+}
+
+button { min-height:50px; }
+
+.app { display:none; }
+</style>
+</head>
+
+<body>
+
+<header>📘 Learn English</header>
+
+<div class="container">
+
+<div id="home">
+  <div class="category-card" onclick="enterCategory('restaurant')">🍽️ Restaurant</div>
+  <div class="category-card" onclick="enterCategory('supermarket')">🛒 Supermarket</div>
+</div>
+
+<div id="app" class="app">
+  <button onclick="goHome()">⬅ Back</button>
+
+  <div id="cards" class="card-container"></div>
+
+  <div id="quiz">
+    <div id="qtext"></div>
+    <div id="options" class="options"></div>
+    <button id="nextBtn" class="next" onclick="nextQ()">Next</button>
+  </div>
+
+  <div id="review"></div>
+</div>
+
+</div>
+
+<div class="tabbar" id="tabbar" style="display:none;">
+  <button onclick="showTab('cards')">📚<br>Cards</button>
+  <button onclick="startQuiz()">🧠<br>Quiz</button>
+  <button onclick="showTab('review')">🔁<br>Review</button>
+</div>
+
+<script>
+
+const data = {
+restaurant: [
+{eng:"menu",chi:"菜單",sen:"Can I see the menu?",trans:"我可以看一下菜單嗎？"},
+{eng:"order",chi:"點餐",sen:"I want to order food.",trans:"我想點餐。"},
+{eng:"bill",chi:"帳單",sen:"Can I have the bill?",trans:"可以給我帳單嗎？"},
+{eng:"table",chi:"桌子",sen:"The table is ready.",trans:"桌子準備好了。"},
+{eng:"reservation",chi:"訂位",sen:"I have a reservation.",trans:"我有訂位。"},
+{eng:"waiter",chi:"服務生",sen:"The waiter is coming.",trans:"服務生來了。"},
+{eng:"water",chi:"水",sen:"Can I get water?",trans:"可以給我水嗎？"},
+{eng:"fork",chi:"叉子",sen:"I need a fork.",trans:"我需要叉子。"},
+{eng:"knife",chi:"刀子",sen:"Use a knife.",trans:"使用刀子。"},
+{eng:"spoon",chi:"湯匙",sen:"I need a spoon.",trans:"我需要湯匙。"},
+{eng:"delicious",chi:"好吃的",sen:"The food is delicious.",trans:"食物很好吃。"},
+{eng:"spicy",chi:"辣的",sen:"This is spicy.",trans:"這很辣。"},
+{eng:"sweet",chi:"甜的",sen:"This dessert is sweet.",trans:"甜點很甜。"},
+{eng:"salty",chi:"鹹的",sen:"The soup is salty.",trans:"湯很鹹。"},
+{eng:"drink",chi:"飲料",sen:"I want a drink.",trans:"我想要飲料。"},
+{eng:"coffee",chi:"咖啡",sen:"I drink coffee.",trans:"我喝咖啡。"},
+{eng:"tea",chi:"茶",sen:"I like tea.",trans:"我喜歡茶。"},
+{eng:"rice",chi:"飯",sen:"I eat rice.",trans:"我吃飯。"},
+{eng:"noodles",chi:"麵",sen:"I like noodles.",trans:"我喜歡麵。"},
+{eng:"dessert",chi:"甜點",sen:"I want dessert.",trans:"我想要甜點。"}
+],
+
+supermarket: [
+{eng:"shopping cart",chi:"購物車",sen:"Push the cart.",trans:"推購物車。"},
+{eng:"basket",chi:"籃子",sen:"Take a basket.",trans:"拿籃子。"},
+{eng:"cashier",chi:"收銀員",sen:"The cashier is busy.",trans:"收銀員很忙。"},
+{eng:"price",chi:"價格",sen:"Check the price.",trans:"查看價格。"},
+{eng:"discount",chi:"折扣",sen:"There is a discount.",trans:"有折扣。"},
+{eng:"receipt",chi:"收據",sen:"Keep the receipt.",trans:"保留收據。"},
+{eng:"milk",chi:"牛奶",sen:"Buy milk.",trans:"買牛奶。"},
+{eng:"bread",chi:"麵包",sen:"I need bread.",trans:"我需要麵包。"},
+{eng:"eggs",chi:"雞蛋",sen:"Buy eggs.",trans:"買雞蛋。"},
+{eng:"fruit",chi:"水果",sen:"Fruit is healthy.",trans:"水果很健康。"},
+{eng:"vegetables",chi:"蔬菜",sen:"Eat vegetables.",trans:"吃蔬菜。"},
+{eng:"meat",chi:"肉",sen:"I buy meat.",trans:"我買肉。"},
+{eng:"fish",chi:"魚",sen:"Fish is fresh.",trans:"魚很新鮮。"},
+{eng:"frozen food",chi:"冷凍食品",sen:"Buy frozen food.",trans:"買冷凍食品。"},
+{eng:"snack",chi:"零食",sen:"I want snacks.",trans:"我想要零食。"},
+{eng:"checkout",chi:"結帳",sen:"Go to checkout.",trans:"去結帳。"},
+{eng:"bag",chi:"袋子",sen:"I need a bag.",trans:"我需要袋子。"},
+{eng:"barcode",chi:"條碼",sen:"Scan the barcode.",trans:"掃描條碼。"},
+{eng:"shelf",chi:"貨架",sen:"The shelf is full.",trans:"貨架滿了。"},
+{eng:"store",chi:"商店",sen:"This store is big.",trans:"這間店很大。"}
+]
+};
+
+let progress = JSON.parse(localStorage.getItem('progress')) || {
+restaurant:{wrong:[]}, supermarket:{wrong:[]}
+};
+
+function saveProgress(){
+localStorage.setItem('progress', JSON.stringify(progress));
+}
+
+function speak(text){
+let u = new SpeechSynthesisUtterance(text);
+u.lang='en-US';
+speechSynthesis.speak(u);
+}
+
+let currentCategory=null;
+let vocab=[];
+let list=[],i=0,current;
+
+function enterCategory(cat){
+currentCategory=cat;
+vocab=data[cat];
+home.style.display='none';
+app.style.display='block';
+tabbar.style.display='flex';
+renderCards();
+showTab('cards');
+}
+
+function goHome(){
+home.style.display='block';
+app.style.display='none';
+tabbar.style.display='none';
+}
+
+function renderCards(){
+cards.innerHTML='';
+vocab.forEach(w=>{
+let c=document.createElement('div');
+c.className='card';
+c.innerHTML=`${w.eng}<div class="english">${w.chi}</div>`;
+c.onclick=()=>{
+let e=c.querySelector('.english');
+e.style.display=e.style.display==='block'?'none':'block';
+};
+cards.appendChild(c);
+});
+}
+
+function showTab(tab){
+cards.style.display=tab==='cards'?'grid':'none';
+quiz.style.display=tab==='quiz'?'block':'none';
+review.style.display=tab==='review'?'block':'none';
+if(tab==='review') showReview();
+}
+
+function startQuiz(){
+showTab('quiz');
+list=[...vocab].sort(()=>Math.random()-0.5);
+i=0;
+nextQ();
+}
+
+function nextQ(){
+if(i>=list.length){ showReview(); return; }
+
+current=list[i];
+qtext.textContent=current.eng;
+
+let opts=[current.chi];
+while(opts.length<3){
+let r=vocab[Math.floor(Math.random()*vocab.length)].chi;
+if(!opts.includes(r)) opts.push(r);
+}
+
+opts.sort(()=>Math.random()-0.5);
+options.innerHTML='';
+nextBtn.style.display='none';
+
+opts.forEach(o=>{
+let b=document.createElement('button');
+b.textContent=o;
+
+b.onclick=()=>{
+document.querySelectorAll('#options button').forEach(x=>x.disabled=true);
+
+if(o===current.chi){
+b.classList.add('correct');
+}else{
+b.classList.add('wrong');
+
+if(!progress[currentCategory].wrong.some(w=>w.eng===current.eng)){
+progress[currentCategory].wrong.push(current);
+saveProgress();
+}
+
+document.querySelectorAll('#options button').forEach(x=>{
+if(x.textContent===current.chi) x.classList.add('correct');
+});
+}
+
+i++;
+nextBtn.style.display='block';
+};
+
+options.appendChild(b);
+});
+}
+
+function showReview(){
+const wrongList = progress[currentCategory].wrong;
+
+if(wrongList.length===0){
+review.innerHTML='🎉 No mistakes!';
+return;
+}
+
+review.innerHTML = `
+<button class="reset-btn" onclick="resetWrong()">🗑 Reset Wrong Words</button>
+` + wrongList.map((w,idx)=>`
+<div class="review-card">
+  <div><b>${w.eng}</b></div>
+  <div>${w.chi}</div>
+
+  <div class="review-sen" onclick="speak('${w.sen}')">
+    ${w.sen}<br>🔊 點我播放
+  </div>
+
+  <div onclick="toggle(${idx})" style="color:blue;margin-top:6px;">
+    顯示翻譯
+  </div>
+
+  <div id="t${idx}" class="translation">${w.trans}</div>
+</div>
+`).join('');
+}
+
+function resetWrong(){
+progress[currentCategory].wrong=[];
+saveProgress();
+showReview();
+}
+
+function toggle(i){
+let el=document.getElementById('t'+i);
+el.style.display = el.style.display==='block'?'none':'block';
+}
+
+</script>
+
+</body>
+</html>
