@@ -204,12 +204,12 @@ supermarket: [
 
 let progress = JSON.parse(localStorage.getItem('progress')) || {};
 
-if(!progress.restaurant){
-  progress.restaurant = {wrong:[]};
-}
-if(!progress.supermarket){
-  progress.supermarket = {wrong:[]};
-}
+// ✅ 一定要加在這裡（初始化後立刻補齊結構）
+['restaurant','supermarket'].forEach(cat=>{
+  if(!progress[cat]){
+    progress[cat] = {wrong:[]};
+  }
+});
 
 function saveProgress(){
 localStorage.setItem('progress', JSON.stringify(progress));
@@ -289,12 +289,16 @@ b.dataset.value = o;
 b.onclick=()=>{
   document.querySelectorAll('#options button').forEach(x=>x.disabled=true);
 
+  if(!progress[currentCategory]){
+    progress[currentCategory] = {wrong:[]};
+  }
+
   if(o===current.chi){
     b.classList.add('correct');
   }else{
     b.classList.add('wrong');
 
-    if(!progress[currentCategory].wrong.some(w=>w.eng===current.eng)){
+    if(!(progress[currentCategory]?.wrong || []).some(w=>w.eng===current.eng)){
       progress[currentCategory].wrong.push(current);
       saveProgress();
     }
