@@ -1,15 +1,16 @@
 <!DOCTYPE html>
-<html lang="zh">
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Learn English</title>
+<title>Learn Indonesian App</title>
 
 <style>
 body { font-family: Arial; margin:0; background:#f5f7fa; }
 header { background:#4CAF50; color:white; text-align:center; padding:15px; }
 .container { padding:15px; }
 
+/* 首頁 */
 .category-card {
   background:white;
   padding:20px;
@@ -20,6 +21,7 @@ header { background:#4CAF50; color:white; text-align:center; padding:15px; }
   box-shadow:0 2px 6px rgba(0,0,0,0.1);
 }
 
+/* 單字卡 */
 .card-container {
   display:grid;
   grid-template-columns:1fr 1fr;
@@ -31,9 +33,9 @@ header { background:#4CAF50; color:white; text-align:center; padding:15px; }
   border-radius:12px;
   text-align:center;
 }
-
 .english { display:none; }
 
+/* Quiz */
 #qtext {
   font-size:28px;
   font-weight:bold;
@@ -50,7 +52,10 @@ header { background:#4CAF50; color:white; text-align:center; padding:15px; }
   border-radius:14px;
   background:#2196F3;
   color:white;
+  font-weight:bold;
+  box-shadow:0 3px 8px rgba(0,0,0,0.15);
 }
+.options button:active { transform:scale(0.97); }
 
 .correct { background:#4CAF50 !important; }
 .wrong { background:#f44336 !important; }
@@ -66,12 +71,16 @@ header { background:#4CAF50; color:white; text-align:center; padding:15px; }
   display:none;
 }
 
+/* Review */
 .review-card {
   background:white;
   padding:16px;
   border-radius:14px;
   margin-bottom:12px;
+  box-shadow:0 2px 8px rgba(0,0,0,0.1);
 }
+.review-ind { font-size:22px; font-weight:bold; }
+.review-eng { color:#666; }
 
 .review-sen {
   margin-top:10px;
@@ -94,6 +103,7 @@ header { background:#4CAF50; color:white; text-align:center; padding:15px; }
   font-weight:bold;
 }
 
+/* tab */
 .tabbar {
   position:fixed;
   bottom:0;
@@ -102,15 +112,7 @@ header { background:#4CAF50; color:white; text-align:center; padding:15px; }
   background:white;
   border-top:1px solid #ddd;
 }
-
-.tabbar button {
-  flex:1;
-  padding:16px;
-  font-size:16px;
-  font-weight:bold;
-}
-
-button { min-height:50px; }
+.tabbar button { flex:1; padding:12px; border:none; }
 
 .app { display:none; }
 </style>
@@ -118,7 +120,7 @@ button { min-height:50px; }
 
 <body>
 
-<header>📘 Learn English</header>
+<header>🌤️ Learn English</header>
 
 <div class="container">
 
@@ -144,13 +146,14 @@ button { min-height:50px; }
 </div>
 
 <div class="tabbar" id="tabbar" style="display:none;">
-  <button onclick="showTab('cards')">📚<br>Cards</button>
-  <button onclick="startQuiz()">🧠<br>Quiz</button>
-  <button onclick="showTab('review')">🔁<br>Review</button>
+  <button onclick="showTab('cards')">📚</button>
+  <button onclick="startQuiz()">🧠</button>
+  <button onclick="showTab('review')">🔁</button>
 </div>
 
 <script>
 
+// 🔥 完整20單字
 const data = {
 restaurant: [
 {eng:"menu",chi:"菜單",sen:"Can I see the menu?",trans:"我可以看一下菜單嗎？"},
@@ -159,13 +162,13 @@ restaurant: [
 {eng:"table",chi:"桌子",sen:"The table is ready.",trans:"桌子準備好了。"},
 {eng:"reservation",chi:"訂位",sen:"I have a reservation.",trans:"我有訂位。"},
 {eng:"waiter",chi:"服務生",sen:"The waiter is coming.",trans:"服務生來了。"},
-{eng:"water",chi:"水",sen:"Can I get water?",trans:"可以給我水嗎？"},
-{eng:"fork",chi:"叉子",sen:"I need a fork.",trans:"我需要叉子。"},
-{eng:"knife",chi:"刀子",sen:"Use a knife.",trans:"使用刀子。"},
+{eng:"water",chi:"水",sen:"Can I get some water?",trans:"可以給我水嗎？"},
+{eng:"fork",chi:"叉子",sen:"I need a fork.",trans:"我需要一支叉子。"},
+{eng:"knife",chi:"刀子",sen:"Use the knife carefully.",trans:"小心使用刀子。"},
 {eng:"spoon",chi:"湯匙",sen:"I need a spoon.",trans:"我需要湯匙。"},
 {eng:"delicious",chi:"好吃的",sen:"The food is delicious.",trans:"食物很好吃。"},
-{eng:"spicy",chi:"辣的",sen:"This is spicy.",trans:"這很辣。"},
-{eng:"sweet",chi:"甜的",sen:"This dessert is sweet.",trans:"甜點很甜。"},
+{eng:"spicy",chi:"辣的",sen:"This is very spicy.",trans:"這很辣。"},
+{eng:"sweet",chi:"甜的",sen:"The dessert is sweet.",trans:"甜點很甜。"},
 {eng:"salty",chi:"鹹的",sen:"The soup is salty.",trans:"湯很鹹。"},
 {eng:"drink",chi:"飲料",sen:"I want a drink.",trans:"我想要飲料。"},
 {eng:"coffee",chi:"咖啡",sen:"I drink coffee.",trans:"我喝咖啡。"},
@@ -176,15 +179,15 @@ restaurant: [
 ],
 
 supermarket: [
-{eng:"shopping cart",chi:"購物車",sen:"Push the cart.",trans:"推購物車。"},
-{eng:"basket",chi:"籃子",sen:"Take a basket.",trans:"拿籃子。"},
+{eng:"shopping cart",chi:"購物車",sen:"Push the shopping cart.",trans:"推購物車。"},
+{eng:"basket",chi:"籃子",sen:"Take a basket.",trans:"拿一個籃子。"},
 {eng:"cashier",chi:"收銀員",sen:"The cashier is busy.",trans:"收銀員很忙。"},
 {eng:"price",chi:"價格",sen:"Check the price.",trans:"查看價格。"},
 {eng:"discount",chi:"折扣",sen:"There is a discount.",trans:"有折扣。"},
 {eng:"receipt",chi:"收據",sen:"Keep the receipt.",trans:"保留收據。"},
-{eng:"milk",chi:"牛奶",sen:"Buy milk.",trans:"買牛奶。"},
+{eng:"milk",chi:"牛奶",sen:"Buy some milk.",trans:"買牛奶。"},
 {eng:"bread",chi:"麵包",sen:"I need bread.",trans:"我需要麵包。"},
-{eng:"eggs",chi:"雞蛋",sen:"Buy eggs.",trans:"買雞蛋。"},
+{eng:"eggs",chi:"雞蛋",sen:"Buy a dozen eggs.",trans:"買一打雞蛋。"},
 {eng:"fruit",chi:"水果",sen:"Fruit is healthy.",trans:"水果很健康。"},
 {eng:"vegetables",chi:"蔬菜",sen:"Eat vegetables.",trans:"吃蔬菜。"},
 {eng:"meat",chi:"肉",sen:"I buy meat.",trans:"我買肉。"},
@@ -200,17 +203,11 @@ supermarket: [
 };
 
 let progress = JSON.parse(localStorage.getItem('progress')) || {
-restaurant:{wrong:[]}, supermarket:{wrong:[]}
+weather:{wrong:[]}, food:{wrong:[]}
 };
 
 function saveProgress(){
 localStorage.setItem('progress', JSON.stringify(progress));
-}
-
-function speak(text){
-let u = new SpeechSynthesisUtterance(text);
-u.lang='en-US';
-speechSynthesis.speak(u);
 }
 
 let currentCategory=null;
@@ -280,27 +277,33 @@ nextBtn.style.display='none';
 opts.forEach(o=>{
 let b=document.createElement('button');
 b.textContent=o;
+b.dataset.value = o;
+
+
 
 b.onclick=()=>{
-document.querySelectorAll('#options button').forEach(x=>x.disabled=true);
+  document.querySelectorAll('#options button').forEach(x=>x.disabled=true);
 
-if(o===current.chi){
-b.classList.add('correct');
-}else{
-b.classList.add('wrong');
+  if(o===current.chi){
+    b.classList.add('correct');
+  }else{
+    b.classList.add('wrong');
 
-if(!progress[currentCategory].wrong.some(w=>w.eng===current.eng)){
-progress[currentCategory].wrong.push(current);
-saveProgress();
-}
+    if(!progress[currentCategory].wrong.some(w=>w.eng===current.eng)){
+      progress[currentCategory].wrong.push(current);
+      saveProgress();
+    }
+  }
 
-document.querySelectorAll('#options button').forEach(x=>{
-if(x.textContent===current.chi) x.classList.add('correct');
-});
-}
+  // ✅ 無論對錯，都標示正確答案
+  document.querySelectorAll('#options button').forEach(x=>{
+    if(x.dataset.value === current.chi){
+      x.classList.add('correct');
+    }
+  });
 
-i++;
-nextBtn.style.display='block';
+  i++;
+  nextBtn.style.display='block';
 };
 
 options.appendChild(b);
@@ -319,18 +322,12 @@ review.innerHTML = `
 <button class="reset-btn" onclick="resetWrong()">🗑 Reset Wrong Words</button>
 ` + wrongList.map((w,idx)=>`
 <div class="review-card">
-  <div><b>${w.eng}</b></div>
-  <div>${w.chi}</div>
-
-  <div class="review-sen" onclick="speak('${w.sen}')">
-    ${w.sen}<br>🔊 點我播放
-  </div>
-
-  <div onclick="toggle(${idx})" style="color:blue;margin-top:6px;">
-    顯示翻譯
-  </div>
-
-  <div id="t${idx}" class="translation">${w.trans}</div>
+<div class="review-ind">${w.eng}</div>
+<div class="review-eng">${w.chi}</div>
+<div class="review-sen" onclick="toggle(${idx})">
+${w.sen}<br>🔊 點我播放
+</div>
+<div id="t${idx}" class="translation">${w.trans}</div>
 </div>
 `).join('');
 }
@@ -344,6 +341,11 @@ showReview();
 function toggle(i){
 let el=document.getElementById('t'+i);
 el.style.display = el.style.display==='block'?'none':'block';
+
+let text = el.previousElementSibling.firstChild.textContent.trim();
+let u=new SpeechSynthesisUtterance(text);
+u.lang='en-US';
+speechSynthesis.speak(u);
 }
 
 </script>
