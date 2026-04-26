@@ -202,9 +202,14 @@ supermarket: [
 ]
 };
 
-let progress = JSON.parse(localStorage.getItem('progress')) || {
-weather:{wrong:[]}, food:{wrong:[]}
-};
+let progress = JSON.parse(localStorage.getItem('progress')) || {};
+
+if(!progress.restaurant){
+  progress.restaurant = {wrong:[]};
+}
+if(!progress.supermarket){
+  progress.supermarket = {wrong:[]};
+}
 
 function saveProgress(){
 localStorage.setItem('progress', JSON.stringify(progress));
