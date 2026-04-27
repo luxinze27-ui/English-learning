@@ -242,8 +242,15 @@ let c=document.createElement('div');
 c.className='card';
 c.innerHTML=`${w.eng}<div class="english">${w.chi}</div>`;
 c.onclick=()=>{
-let e=c.querySelector('.english');
-e.style.display=e.style.display==='block'?'none':'block';
+  let e=c.querySelector('.english');
+
+  // 切換中文顯示
+  e.style.display = e.style.display==='block' ? 'none' : 'block';
+
+  // 🔊 播放英文發音
+  let u = new SpeechSynthesisUtterance(w.eng);
+  u.lang = 'en-US';
+  speechSynthesis.speak(u);
 };
 cards.appendChild(c);
 });
